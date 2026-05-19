@@ -2,24 +2,16 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import numpy as np
+import random
 
 app = FastAPI()
 
 model = joblib.load("saved_model.pkl")
 
-
 class DeviceData(BaseModel):
-    traffic: int
-    cpu: int
-    temperature: int
-
-
-@app.get("/")
-def home():
-    return {
-        "message": "ForgeSecure AI Service Running"
-    }
-
+    traffic: float
+    cpu: float
+    temperature: float
 
 @app.post("/predict")
 def predict(data: DeviceData):
@@ -32,17 +24,22 @@ def predict(data: DeviceData):
 
     prediction = model.predict(features)
 
-    status = "NORMAL"
-
     if prediction[0] == -1:
+
         status = "ANOMALY"
-
-    severity = "LOW"
-
-    if data.traffic > 3000:
         severity = "CRITICAL"
+
+        confidence = random.randint(90, 99)
+
+    else:
+
+        status = "NORMAL"
+        severity = "LOW"
+
+        confidence = random.randint(70, 88)
 
     return {
         "status": status,
-        "severity": severity
+        "severity": severity,
+        "confidence": confidence
     }

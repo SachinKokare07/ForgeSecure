@@ -1,47 +1,49 @@
 const mongoose = require("mongoose");
 
-const logSchema = new mongoose.Schema(
-  {
-    device: {
-      type: String,
-      required: true,
-    },
+const logSchema = new mongoose.Schema({
 
-    traffic: {
-      type: Number,
-      required: true,
-    },
-
-    cpu: {
-      type: Number,
-      required: true,
-    },
-
-    temperature: {
-      type: Number,
-      required: true,
-    },
-
-    status: {
-      type: String,
-      enum: ["NORMAL", "ANOMALY"],
-      default: "NORMAL",
-    },
-
-    severity: {
-      type: String,
-      enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
-      default: "LOW",
-    },
-
-    timestamp: {
-      type: Date,
-      default: Date.now,
-    },
+  device: {
+    type: String,
+    required: true,
   },
-  {
-    timestamps: true,
-  }
-);
+
+  traffic: {
+    type: Number,
+    required: true,
+  },
+
+  cpu: {
+    type: Number,
+    required: true,
+  },
+
+  temperature: {
+    type: Number,
+    required: true,
+  },
+
+  status: {
+    type: String,
+    required: true,
+  },
+
+  severity: {
+    type: String,
+    required: true,
+  },
+
+  confidence: {
+    type: Number,
+    required: true,
+  },
+  
+  incidentStatus: {
+  type: String,
+  default: "ACTIVE",
+  },
+
+}, {
+  timestamps: true,
+});
 
 module.exports = mongoose.model("Log", logSchema);

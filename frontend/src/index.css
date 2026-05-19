@@ -1,9 +1,233 @@
 @import "tailwindcss";
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: #020617;
+}
+
 body {
   margin: 0;
-  padding: 0;
-  background-color: #0f172a;
-  color: white;
-  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  color: #e2e8f0;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 22%),
+    radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.1), transparent 24%),
+    linear-gradient(180deg, #020617 0%, #07111f 45%, #020617 100%);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 92%);
+  animation: gridDrift 28s linear infinite;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(34, 211, 238, 0.05) 50%, transparent 100%);
+  background-size: 100% 220px;
+  opacity: 0.45;
+  animation: scanSweep 9s linear infinite;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+  color: #ecfeff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.5);
+}
+
+@keyframes liveCardIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    filter: blur(2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes criticalCardPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.16), 0 0 28px rgba(239, 68, 68, 0.12);
+    transform: translateY(0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.34), 0 0 44px rgba(239, 68, 68, 0.28);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes criticalBannerFlash {
+  0%,
+  100% {
+    filter: brightness(1);
+    opacity: 1;
+  }
+
+  50% {
+    filter: brightness(1.25);
+    opacity: 0.92;
+  }
+}
+
+@keyframes alertPing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.65;
+  }
+
+  70% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+.animate-live-card {
+  animation: liveCardIn 0.6s ease-out;
+}
+
+.animate-critical-card {
+  animation: criticalCardPulse 1.3s ease-in-out infinite;
+}
+
+.critical-banner {
+  animation: criticalBannerFlash 1.5s ease-in-out infinite;
+}
+
+.critical-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  animation: alertPing 1.8s ease-out infinite;
+}
+
+.telemetry-sweep {
+  animation: telemetrySweep 7s linear infinite;
+}
+
+.soc-ticker {
+  display: inline-flex;
+  will-change: transform;
+  animation: socTicker 14s linear infinite;
+}
+
+.scan-orbit {
+  position: relative;
+  isolation: isolate;
+}
+
+.scan-orbit::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  border-left-color: rgba(34, 211, 238, 0.75);
+  border-top-color: rgba(34, 211, 238, 0.35);
+  animation: spin 6s linear infinite;
+}
+
+@keyframes gridDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(56px, 56px, 0);
+  }
+}
+
+@keyframes scanSweep {
+  0% {
+    transform: translateY(-20%);
+  }
+
+  100% {
+    transform: translateY(120%);
+  }
+}
+
+@keyframes telemetrySweep {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes socTicker {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.6);
 }

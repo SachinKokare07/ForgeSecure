@@ -40,9 +40,9 @@ const sendData = async () => {
 
     console.log("\nGenerating Industrial Data...");
 
-    const isAttack = true;
+    const isAttack = Math.random() < 0.2;
 
-    const data = isAttack
+    const data = isAttack 
       ? generateAttackData()
       : generateNormalData();
 
