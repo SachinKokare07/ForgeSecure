@@ -95,14 +95,11 @@ cd ForgeSecure
 cd backend
 npm install
 ```
+You can create your own `.env` file using `.env.example` as reference.
 
-Create a `.env` file inside `backend/`:
+Example:
 
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-AI_SERVICE_URL=http://127.0.0.1:8000/predict
-```
+cp .env.example .env
 
 Start the backend:
 
