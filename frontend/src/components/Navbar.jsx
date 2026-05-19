@@ -10,7 +10,7 @@ function Navbar({ lastUpdated, totalLogs, connectionLabel = 'Polling backend eve
               </div>
               <div>
                 <p className="text-lg font-semibold uppercase tracking-[0.18em] text-white">ForgeSecure</p>
-                <p className="text-sm text-slate-400">AI-Powered Industrial Threat Detection Platform</p>
+                <p className="text-sm text-slate-400">AI-Powered Network Anomaly Detection Platform</p>
               </div>
             </div>
 
@@ -34,7 +34,7 @@ function Navbar({ lastUpdated, totalLogs, connectionLabel = 'Polling backend eve
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
           <Pill tone="cyan">Logs: {totalLogs}</Pill>
           <Pill tone="slate">Updated: {lastUpdated}</Pill>
-          <Pill tone="cyan">Live telemetry scan</Pill>
+          <Pill tone="cyan">Live network telemetry scan</Pill>
         </div>
       </div>
     </header>

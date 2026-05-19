@@ -320,7 +320,7 @@ function Dashboard() {
               <span className="critical-pulse relative inline-flex h-3 w-3 rounded-full bg-red-400" />
 
               <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-red-100">
-                Critical Industrial Threat Detected
+                Critical Network Threat Detected
               </span>
 
               <span className="hidden text-red-50/85 sm:inline">
@@ -342,12 +342,12 @@ function Dashboard() {
         onToggleSound={() => setSoundEnabled((value) => !value)}
       />
 
-      <main className="mx-auto w-full max-w-7xl px-3 py-4 sm:px-4 lg:px-6 lg:py-5">
+      <main className="mx-auto w-full max-w-full px-4 py-5 sm:px-6 lg:px-8">
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <StatsCard
             title="Total Logs"
             value={totalLogs}
-            subtitle="Industrial telemetry events."
+            subtitle="Network telemetry events."
             tone="cyan"
             accentLabel="Live"
           />
@@ -377,8 +377,8 @@ function Dashboard() {
           />
         </section>
 
-        <section className="mt-4 grid gap-4 xl:grid-cols-[1.6fr_0.9fr]">
-          <div className="space-y-4">
+        <section className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr] xl:items-stretch">
+          <div className="grid h-full min-h-0 grid-rows-3 gap-4 auto-rows-fr">
             <TrafficChart logs={chartLogs} />
 
             <RiskChart logs={chartLogs} />
@@ -386,7 +386,7 @@ function Dashboard() {
             <HeatmapChart logs={chartLogs} />
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+          <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60 p-5 self-stretch">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-white">
@@ -394,21 +394,23 @@ function Dashboard() {
                 </h3>
 
                 <p className="mt-1 text-sm text-slate-400">
-                  Latest OT telemetry.
+                  Latest network telemetry.
                 </p>
               </div>
             </div>
 
-            <div className="mt-3 space-y-2.5">
+            <div className="mt-3 min-h-0 flex-1 space-y-2.5 overflow-auto pr-1">
               {liveFeed.length ? (
                 liveFeed.map((log) => (
                   <AlertCard
                     key={log._id}
                     id={log._id}
                     device={log.device}
-                    traffic={log.traffic}
-                    cpu={log.cpu}
-                    temperature={log.temperature}
+                    duration={log.duration}
+                    src_bytes={log.src_bytes}
+                    dst_bytes={log.dst_bytes}
+                    src_pkts={log.src_pkts}
+                    dst_pkts={log.dst_pkts}
                     severity={log.severity}
                     status={log.status}
                     confidence={log.confidence}
@@ -427,11 +429,11 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="-mt-4 grid gap-3 xl:grid-cols-[1.55fr_0.95fr]">
+        <section className="-mt-4 grid gap-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr]">
           <DeviceTable logs={sortedLogs} />
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4 flex flex-col overflow-hidden max-h-[550px]">
-            <div className="flex items-center justify-between flex-shrink-0">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4 flex flex-col overflow-hidden h-full min-h-0">
+            <div className="flex items-center justify-between shrink-0">
               <div>
                 <h3 className="text-base font-semibold text-white">
                   Recent Anomalies
@@ -452,9 +454,11 @@ function Dashboard() {
                       key={log._id}
                       id={log._id}
                       device={log.device}
-                      traffic={log.traffic}
-                      cpu={log.cpu}
-                      temperature={log.temperature}
+                      duration={log.duration}
+                      src_bytes={log.src_bytes}
+                      dst_bytes={log.dst_bytes}
+                      src_pkts={log.src_pkts}
+                      dst_pkts={log.dst_pkts}
                       severity={log.severity}
                       status={log.status}
                       confidence={log.confidence}
@@ -510,11 +514,15 @@ function normalizeLogs(data) {
 
     device: log.device || "UNKNOWN_DEVICE",
 
-    traffic: Number(log.traffic) || 0,
+    duration: Number(log.duration) || 0,
 
-    cpu: Number(log.cpu) || 0,
+    src_bytes: Number(log.src_bytes) || 0,
 
-    temperature: Number(log.temperature) || 0,
+    dst_bytes: Number(log.dst_bytes) || 0,
+
+    src_pkts: Number(log.src_pkts) || 0,
+
+    dst_pkts: Number(log.dst_pkts) || 0,
 
     confidence: Number(log.confidence) || 0,
 

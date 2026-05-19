@@ -8,38 +8,79 @@ app = FastAPI()
 
 model = joblib.load("saved_model.pkl")
 
+scaler = joblib.load("saved_scaler.pkl")
+
 class DeviceData(BaseModel):
-    traffic: float
-    cpu: float
-    temperature: float
+
+    duration: float
+
+    src_bytes: float
+
+    dst_bytes: float
+
+    src_pkts: float
+
+    dst_pkts: float
 
 @app.post("/predict")
 def predict(data: DeviceData):
 
-    features = np.array([[
-        data.traffic,
-        data.cpu,
-        data.temperature
-    ]])
+    try:
 
-    prediction = model.predict(features)
+        features = np.array([[
+            data.duration,
+            data.src_bytes,
+            data.dst_bytes,
+            data.src_pkts,
+            data.dst_pkts
+        ]])
 
-    if prediction[0] == -1:
+        scaled_features = scaler.transform(
+            features
+        )
 
-        status = "ANOMALY"
-        severity = "CRITICAL"
+        prediction = model.predict(
+            scaled_features
+        )
 
-        confidence = random.randint(90, 99)
+        if prediction[0] == -1:
 
-    else:
+            status = "ANOMALY"
 
-        status = "NORMAL"
-        severity = "LOW"
+            severity = "CRITICAL"
 
-        confidence = random.randint(70, 88)
+            confidence = random.randint(
+                90,
+                99
+            )
 
-    return {
-        "status": status,
-        "severity": severity,
-        "confidence": confidence
-    }
+        else:
+
+            status = "NORMAL"
+
+            severity = "LOW"
+
+            confidence = random.randint(
+                70,
+                88
+            )
+
+        return {
+
+            "status": status,
+
+            "severity": severity,
+
+            "confidence": confidence
+
+        }
+
+    except Exception as error:
+
+        return {
+
+            "success": False,
+
+            "message": str(error)
+
+        }

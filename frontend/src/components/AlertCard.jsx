@@ -1,9 +1,11 @@
 function AlertCard({
   id,
   device,
-  traffic,
-  cpu,
-  temperature,
+  duration,
+  src_bytes,
+  dst_bytes,
+  src_pkts,
+  dst_pkts,
   severity,
   status,
   confidence,
@@ -81,8 +83,8 @@ function AlertCard({
             }`}
           >
             {status === "ANOMALY"
-              ? "Suspicious industrial activity detected."
-              : "Device is operating within expected thresholds."}
+              ? "Network anomaly activity detected."
+              : "Network telemetry is operating within expected thresholds."}
           </p>
 
         </div>
@@ -107,24 +109,42 @@ function AlertCard({
 
       </div>
 
-      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm sm:mt-4 sm:gap-3">
+      <div
+        className={`mt-3 grid gap-2 text-sm sm:mt-4 sm:gap-3 ${
+              compact
+            ? "grid-cols-2 sm:grid-cols-3"
+            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6"
+        }`}
+      >
 
         <Metric
-          label="Traffic"
-          value={traffic}
-          unit=" Mbps"
+          label="Duration"
+          value={formatDuration(duration)}
+          unit=" s"
         />
 
         <Metric
-          label="CPU"
-          value={cpu}
-          unit="%"
+          label="Src Bytes"
+          value={formatBytes(src_bytes)}
+          unit=""
         />
 
         <Metric
-          label="Temp"
-          value={temperature}
-          unit="°C"
+          label="Dst Bytes"
+          value={formatBytes(dst_bytes)}
+          unit=""
+        />
+
+        <Metric
+          label="Src Packets"
+          value={formatCount(src_pkts)}
+          unit=""
+        />
+
+        <Metric
+          label="Dst Packets"
+          value={formatCount(dst_pkts)}
+          unit=""
         />
 
         <Metric
@@ -197,19 +217,19 @@ function Metric({
   return (
 
     <div
-      className={`rounded-lg border px-2.5 py-2 sm:px-3 ${
+      className={`min-w-21 sm:min-w-26 max-w-32 rounded-lg border px-2.5 py-2 text-center sm:px-3 flex flex-col items-center justify-center ${
         highlight
           ? "border-cyan-400/20 bg-cyan-400/10"
           : "border-white/5 bg-white/5"
       }`}
     >
 
-      <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">
+      <p className="text-[9px] font-semibold uppercase tracking-[0.04em] text-slate-500 leading-snug whitespace-normal wrap-break-word sm:text-[10px]">
         {label}
       </p>
 
       <p
-        className={`mt-1 font-semibold ${
+        className={`mt-1 text-sm sm:text-base font-semibold leading-tight ${
           highlight
             ? "text-cyan-300"
             : "text-white"
@@ -222,6 +242,38 @@ function Metric({
     </div>
 
   );
+}
+
+function formatDuration(value) {
+  const num = Number(value) || 0;
+
+  return num.toFixed(num >= 10 || Number.isInteger(num) ? 0 : 1);
+}
+
+function formatCount(value) {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 0,
+  }).format(Number(value) || 0);
+}
+
+function formatBytes(value) {
+  const num = Number(value) || 0;
+
+  if (num >= 1024 * 1024 * 1024) {
+    return `${(num / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  }
+
+  if (num >= 1024 * 1024) {
+    return `${(num / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  if (num >= 1024) {
+    return `${(num / 1024).toFixed(1)} KB`;
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 0,
+  }).format(num);
 }
 
 export default AlertCard;

@@ -7,17 +7,27 @@ const logSchema = new mongoose.Schema({
     required: true,
   },
 
-  traffic: {
+  duration: {
     type: Number,
     required: true,
   },
 
-  cpu: {
+  src_bytes: {
     type: Number,
     required: true,
   },
 
-  temperature: {
+  dst_bytes: {
+    type: Number,
+    required: true,
+  },
+
+  src_pkts: {
+    type: Number,
+    required: true,
+  },
+
+  dst_pkts: {
     type: Number,
     required: true,
   },
@@ -36,10 +46,10 @@ const logSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  
+
   incidentStatus: {
-  type: String,
-  default: "ACTIVE",
+    type: String,
+    default: "ACTIVE",
   },
 
 }, {

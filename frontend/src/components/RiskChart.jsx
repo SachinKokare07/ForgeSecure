@@ -34,7 +34,7 @@ function RiskChart({ logs }) {
     : 0
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60 p-4 shadow-[0_20px_80px_rgba(2,6,23,0.35)] sm:p-5">
+    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60 p-4 shadow-[0_20px_80px_rgba(2,6,23,0.35)] sm:p-5 h-56 sm:h-64 md:h-72 lg:h-full">
       <div className="pointer-events-none absolute inset-0 opacity-50">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.10),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.08),transparent_25%)]" />
       </div>
@@ -48,7 +48,7 @@ function RiskChart({ logs }) {
             <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-rose-300">Risk Exposure</p>
           </div>
           <h3 className="text-lg font-semibold text-white sm:text-xl">Threat Risk Analysis</h3>
-          <p className="mt-1 text-sm text-slate-400">Live risk score derived from traffic, CPU, temperature, and anomaly state.</p>
+          <p className="mt-1 text-sm text-slate-400">Live risk score derived from duration, bytes, packets, and anomaly state.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-right text-xs text-slate-300">
@@ -57,7 +57,7 @@ function RiskChart({ logs }) {
         </div>
       </div>
 
-      <div className="relative h-56 w-full sm:h-64">
+      <div className="relative min-h-0 flex-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
             <defs>
@@ -88,13 +88,13 @@ function RiskChart({ logs }) {
 }
 
 function calculateRiskScore(log) {
-  const trafficComponent = Math.min(40, Math.round((Number(log.traffic) || 0) / 100))
-  const cpuComponent = Math.min(25, Math.round((Number(log.cpu) || 0) / 4))
-  const temperatureComponent = Math.min(20, Math.round((Number(log.temperature) || 0) / 4))
+  const durationComponent = Math.min(25, Math.round((Number(log.duration) || 0) * 2))
+  const byteComponent = Math.min(35, Math.round(((Number(log.src_bytes) || 0) + (Number(log.dst_bytes) || 0)) / 5000))
+  const packetComponent = Math.min(20, Math.round(((Number(log.src_pkts) || 0) + (Number(log.dst_pkts) || 0)) / 10))
   const anomalyComponent = log.status === 'ANOMALY' ? 20 : 0
   const criticalComponent = log.severity === 'CRITICAL' ? 15 : 0
 
-  return Math.min(100, trafficComponent + cpuComponent + temperatureComponent + anomalyComponent + criticalComponent)
+  return Math.min(100, durationComponent + byteComponent + packetComponent + anomalyComponent + criticalComponent)
 }
 
 function Metric({ label, value, tone }) {
@@ -104,9 +104,13 @@ function Metric({ label, value, tone }) {
   }
 
   return (
-    <div className={`rounded-lg border px-2.5 py-2 ${toneClasses[tone] || toneClasses.amber}`}>
-      <p className="text-[10px] uppercase tracking-[0.24em] text-slate-500">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-white">{value}</p>
+    <div
+      className={`min-w-21 sm:min-w-26 lg:min-w-28 xl:min-w-32 max-w-32 rounded-lg border px-2.5 py-2 flex flex-col items-center justify-center ${
+        toneClasses[tone] || toneClasses.amber
+      }`}
+    >
+      <p className="text-[9px] font-semibold uppercase tracking-[0.04em] text-slate-500 leading-snug whitespace-normal wrap-break-word sm:text-[10px]">{label}</p>
+      <p className="mt-1 text-sm sm:text-base font-semibold leading-tight text-white">{value}</p>
     </div>
   )
 }
@@ -114,16 +118,18 @@ function Metric({ label, value, tone }) {
 function RiskTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
 
-  const { riskScore, traffic, cpu, temperature, status, severity } = payload[0].payload
+  const { riskScore, duration, src_bytes, dst_bytes, src_pkts, dst_pkts, status, severity } = payload[0].payload
 
   return (
     <div className="rounded-xl border border-white/10 bg-slate-950/95 px-4 py-3 shadow-2xl backdrop-blur">
       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{label}</p>
       <p className="mt-2 text-sm font-semibold text-white">Risk score: {riskScore}</p>
       <div className="mt-2 space-y-1 text-sm text-slate-300">
-        <p>Traffic: {traffic}</p>
-        <p>CPU: {cpu}%</p>
-        <p>Temperature: {temperature}°C</p>
+        <p>Duration: {duration}</p>
+        <p>Src Bytes: {src_bytes}</p>
+        <p>Dst Bytes: {dst_bytes}</p>
+        <p>Src Packets: {src_pkts}</p>
+        <p>Dst Packets: {dst_pkts}</p>
         <p>Status: {status}</p>
         <p>Severity: {severity}</p>
       </div>

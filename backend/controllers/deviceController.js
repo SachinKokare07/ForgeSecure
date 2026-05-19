@@ -1,22 +1,49 @@
+const axios = require("axios");
+
 const Log = require("../models/Log");
 
-const getPrediction = require("../services/aiService");
+const receiveDeviceData = async (
+  req,
+  res
+) => {
 
-const receiveDeviceData = async (req, res) => {
   try {
-    console.log("Incoming Data:");
-    console.log(req.body);
 
-    const prediction = await getPrediction(req.body);
+    const aiResponse = await axios.post(
+
+      process.env.AI_SERVICE_URL,
+
+      {
+
+        duration: req.body.duration,
+
+        src_bytes: req.body.src_bytes,
+
+        dst_bytes: req.body.dst_bytes,
+
+        src_pkts: req.body.src_pkts,
+
+        dst_pkts: req.body.dst_pkts,
+
+      }
+
+    );
+
+    const prediction = aiResponse.data;
 
     const newLog = await Log.create({
+
       device: req.body.device,
 
-      traffic: req.body.traffic,
+      duration: req.body.duration,
 
-      cpu: req.body.cpu,
+      src_bytes: req.body.src_bytes,
 
-      temperature: req.body.temperature,
+      dst_bytes: req.body.dst_bytes,
+
+      src_pkts: req.body.src_pkts,
+
+      dst_pkts: req.body.dst_pkts,
 
       status: prediction.status,
 
@@ -24,48 +51,89 @@ const receiveDeviceData = async (req, res) => {
 
       confidence: prediction.confidence,
 
-      incidentStatus: prediction.status === "ANOMALY" ? "ACTIVE" : "RESOLVED",
+      incidentStatus:
+        prediction.status === "ANOMALY"
+          ? "ACTIVE"
+          : "RESOLVED",
+
     });
 
-    req.io.emit("new-log", newLog);
+    req.io.emit(
+      "new-log",
+      newLog
+    );
 
-    if (prediction.status === "ANOMALY") {
-      req.io.emit("anomaly-detected", newLog);
+    if (
+      prediction.status === "ANOMALY"
+    ) {
+
+      req.io.emit(
+        "anomaly-detected",
+        newLog
+      );
+
     }
 
     res.status(201).json({
+
       success: true,
+
       data: newLog,
+
     });
+
   } catch (error) {
-    console.log(error);
+
+    console.log(error.message);
 
     res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
+
   }
+
 };
 
-const getLogs = async (req, res) => {
+const getLogs = async (
+  req,
+  res
+) => {
+
   try {
-    const logs = await Log.find().sort({ createdAt: -1 }).limit(50);
+
+    const logs = await Log.find()
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
+
       success: true,
+
       data: logs,
+
     });
+
   } catch (error) {
-    console.log(error);
 
     res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
+
   }
+
 };
 
-const updateIncidentStatus = async (req, res) => {
+const updateIncidentStatus = async (
+  req,
+  res
+) => {
 
   try {
 
@@ -73,19 +141,20 @@ const updateIncidentStatus = async (req, res) => {
 
     const { incidentStatus } = req.body;
 
-    const updatedLog = await Log.findByIdAndUpdate(
+    const updatedLog =
+      await Log.findByIdAndUpdate(
 
-      id,
+        id,
 
-      {
-        incidentStatus,
-      },
+        {
+          incidentStatus,
+        },
 
-      {
-        new: true,
-      }
+        {
+          new: true,
+        }
 
-    );
+      );
 
     req.io.emit(
       "incident-updated",
@@ -93,17 +162,21 @@ const updateIncidentStatus = async (req, res) => {
     );
 
     res.status(200).json({
+
       success: true,
+
       data: updatedLog,
+
     });
 
   } catch (error) {
 
-    console.log(error);
-
     res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
 
   }
@@ -111,7 +184,11 @@ const updateIncidentStatus = async (req, res) => {
 };
 
 module.exports = {
+
   receiveDeviceData,
+
   getLogs,
+
   updateIncidentStatus,
+
 };
