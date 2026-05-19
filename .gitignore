@@ -1,71 +1,35 @@
-# =========================
-# NODE MODULES
-# =========================
-
+# Dependencies
 node_modules/
 
-# =========================
-# ENV FILES
-# =========================
-
+# Environment variables
 .env
+**/.env
 
-# =========================
-# LOG FILES
-# =========================
-
-logs
-*.log
-npm-debug.log*
-
-# =========================
-# BUILD FILES
-# =========================
-
-dist/
-build/
-
-# =========================
-# VITE
-# =========================
-
-.vite/
-
-# =========================
-# PYTHON
-# =========================
-
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Python Virtual Environment
+# Python virtual env
 venv/
 env/
 
-# =========================
-# MODEL FILES
-# =========================
+# Python cache
+__pycache__/
+*.pyc
 
+# Logs
+*.log
+
+# Build folders
+dist/
+build/
+
+# Vite
+.vite/
+
+# Model files
 *.pkl
 
-# =========================
-# OS FILES
-# =========================
-
-.DS_Store
-Thumbs.db
-
-# =========================
-# IDE FILES
-# =========================
-
+# IDE
 .vscode/
 .idea/
 
-# =========================
-# MONGO LOCAL DATA
-# =========================
-
-data/
+# OS files
+.DS_Store
+Thumbs.db
