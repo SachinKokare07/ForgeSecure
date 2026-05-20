@@ -1,32 +1,13 @@
 const axios = require("axios");
 
-const AI_API_URL = "http://localhost:8000/predict";
+const AI_SERVICE_URL = "http://localhost:8000/predict";
 
 const getPrediction = async (data) => {
   try {
-
-    const response = await axios.post(AI_API_URL, {
-      traffic: data.traffic,
-      cpu: data.cpu,
-      temperature: data.temperature,
-    });
-
+    const response = await axios.post(AI_SERVICE_URL, data);
     return response.data;
-
   } catch (error) {
-
-    console.log("AI Service Error:");
-
-    if (error.response) {
-      console.log(error.response.data);
-    } else {
-      console.log(error.message);
-    }
-
-    return {
-      status: "NORMAL",
-      severity: "LOW",
-    };
+    throw error;
   }
 };
 

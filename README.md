@@ -1,140 +1,41 @@
-# 🔐 ForgeSecure
+# ForgeSecure
 
-> **Real-time Industrial Security Operations Center (SOC) Dashboard**
+A compact guide to get ForgeSecure running locally. This README focuses on a clear quick-start, required services, and where to look for code.
 
-ForgeSecure monitors industrial device telemetry, detects anomalies using AI, and manages security incidents in real time. It simulates industrial network traffic from devices such as PLCs, CNC machines, and robotic arms — analyzing, storing, and streaming live data to a React dashboard.
+## Overview
 
----
+ForgeSecure is a real-time Industrial Security Operations Center (SOC) prototype. It simulates industrial devices, collects telemetry, runs AI-based anomaly detection, stores logs in MongoDB, and displays incidents on a React dashboard with live Socket.IO updates.
 
-## 📋 Table of Contents
+## Quickstart (fast path)
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [API Endpoints](#api-endpoints)
-- [AI Detection Logic](#ai-detection-logic)
-- [Real-Time Features](#real-time-features)
-- [Incident Workflow](#incident-workflow)
-- [Future Improvements](#future-improvements)
-- [License](#license)
+Prerequisites: `node >= 16`, `npm`, `python >= 3.8`, `pip`, and MongoDB running locally or accessible via connection string.
 
----
-
-## ✨ Features
-
-- 📡 **Real-time industrial telemetry monitoring**
-- 🤖 **AI-based anomaly detection** with confidence scoring
-- 🚨 **Live threat feed** and critical threat alerts
-- 🗂️ **Incident management workflow** (Active → Acknowledged → Resolved)
-- 📊 **Traffic analytics charts**
-- 🔄 **Socket.IO live updates** — no page reload needed
-- 🏭 **Industrial device simulator** (PLC, CNC, Robot Arm)
-- 🗄️ **MongoDB log storage**
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technologies |
-|---|---|
-| **Frontend** | React, Tailwind CSS, Recharts, Axios, Socket.IO Client |
-| **Backend** | Node.js, Express.js, MongoDB, Mongoose, Socket.IO |
-| **AI Service** | Python, FastAPI, Scikit-learn, Joblib |
-
----
-
-## 📁 Project Structure
-
-```
-ForgeSecure/
-│
-├── backend/
-│   ├── config/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── simulator/
-│   ├── server.js
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── socket/
-│   │   └── App.jsx
-│   └── package.json
-│
-├── ai-service/
-│   ├── app.py
-│   ├── train.py
-│   ├── saved_model.pkl
-│   └── requirements.txt
-│
-└── README.md
-```
-
----
-
-## 🚀 Installation
-
-### 1. Clone the Repository
+1) Clone the repo
 
 ```bash
 git clone <repository-url>
 cd ForgeSecure
 ```
 
----
-
-### 2. Backend Setup
+2) Start backend (API + simulator)
 
 ```bash
 cd backend
 npm install
-```
-You can create your own `.env` file using `.env.example` as reference.
-
-Example:
-
-cp .env.example .env
-
-Start the backend:
-
-```bash
+# create .env from .env.example and set MONGO_URI if needed
 npm run dev
 ```
 
-> Backend runs at `http://localhost:5000`
-
----
-
-### 3. AI Service Setup
+3) Start AI service
 
 ```bash
 cd ai-service
-pip install fastapi uvicorn scikit-learn numpy pandas joblib
-```
-
-Train the model:
-
-```bash
-python train.py
-```
-
-This generates `saved_model.pkl`. Then start the AI service:
-
-```bash
+pip install -r requirements.txt
+python train.py    # trains and writes saved_model.pkl
 uvicorn app:app --reload --port 8000
 ```
 
-> AI service runs at `http://127.0.0.1:8000`
-
----
-
-### 4. Frontend Setup
+4) Start frontend
 
 ```bash
 cd frontend
@@ -142,42 +43,51 @@ npm install
 npm run dev
 ```
 
-> Frontend runs at `http://localhost:5173`
-
----
-
-### 5. Start the Industrial Simulator
+5) (Optional) Run the simulator separately
 
 ```bash
 cd backend
 node simulator/simulator.js
 ```
 
-The simulator continuously sends industrial telemetry data to the backend.
+After these steps the services typically run at:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:5000
+- AI service: http://127.0.0.1:8000
 
----
+## Project layout (important files)
 
-## 📡 API Endpoints
+- `backend/` — Express API, Socket.IO, simulator (start point: `server.js`)
+- `frontend/` — React + Vite app (entry: `src/main.jsx`, page: `src/pages/Dashboard.jsx`)
+- `ai-service/` — FastAPI endpoint and training (`app.py`, `train.py`)
 
-### Logs
+See relevant code for controllers and services:
+- `backend/controllers/` — API handlers
+- `backend/routes/` — Express routes
+- `backend/simulator/` — `simulator.js` sends telemetry to API
+- `frontend/src/services/api.js` — frontend API wrappers
+- `frontend/src/socket/socket.js` — Socket.IO client setup
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/logs` | Retrieve all logs |
+## How it works (brief)
 
-### Device Telemetry
+1. Simulator or real devices POST telemetry to the backend `/api/device-data`.
+2. Backend stores logs, forwards data to the AI service for scoring, and broadcasts anomalies via Socket.IO.
+3. Frontend subscribes to Socket.IO for live telemetry and incident updates.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/device-data` | Send device telemetry data |
+## Useful commands
 
-### Incident Management
+- Start backend: `cd backend && npm run dev`
+- Run simulator: `node backend/simulator/simulator.js`
+- Start AI service (dev): `uvicorn app:app --reload --port 8000`
+- Start frontend: `cd frontend && npm run dev`
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `PATCH` | `/api/logs/:id/status` | Update incident status |
+## API (short)
 
-**Request Body:**
+- `GET /api/logs` — fetch logs
+- `POST /api/device-data` — submit telemetry
+- `PATCH /api/logs/:id/status` — update incident status (`ACTIVE`, `ACKNOWLEDGED`, `RESOLVED`)
+
+Request example for status update:
 
 ```json
 {
@@ -185,86 +95,16 @@ The simulator continuously sends industrial telemetry data to the backend.
 }
 ```
 
-**Possible Status Values:**
+## Notes & next steps
 
-| Value | Description |
-|-------|-------------|
-| `ACTIVE` | Newly detected incident |
-| `ACKNOWLEDGED` | Analyst has reviewed it |
-| `RESOLVED` | Incident closed |
+- If you use a remote MongoDB, set `MONGO_URI` in `backend/.env`.
+- The AI service requires training data; see `ai-service/dataset` and `train.py`.
+- To enable TLS, authentication, or RBAC, extend the backend middleware and frontend auth flows.
 
----
+## Contributing
 
-## 🧠 AI Detection Logic
+Small PRs welcome. For larger changes, open an issue first to discuss design.
 
-The AI service analyzes the following telemetry signals:
+## License
 
-- 🌐 Network traffic
-- 💻 CPU usage
-- 🌡️ Temperature
-
-Each data point is classified as:
-
-| Classification | Description |
-|---|---|
-| `NORMAL` | Expected device behavior |
-| `ANOMALY` | Suspicious or irregular behavior |
-
-Anomalies also include a **severity level** and **confidence score** for analyst triage.
-
----
-
-## ⚡ Real-Time Features
-
-ForgeSecure uses **Socket.IO** to push live updates for:
-
-- Live telemetry streams
-- Incident synchronization across clients
-- Anomaly broadcasts
-- Dashboard refresh without page reload
-
----
-
-## 🔄 Incident Workflow
-
-```
-AI detects anomaly
-       │
-       ▼
-Incident marked ACTIVE
-       │
-       ▼
-Analyst acknowledges → ACKNOWLEDGED
-       │
-       ▼
-Incident resolved manually → RESOLVED
-```
-
----
-
-## 🏭 Sample Devices
-
-| Device ID | Type |
-|---|---|
-| `PLC_01` | Programmable Logic Controller |
-| `PLC_02` | Programmable Logic Controller |
-| `CNC_MACHINE_01` | CNC Machine |
-| `ROBOT_ARM_01` | Robotic Arm |
-| `UNKNOWN_DEVICE` | Unidentified Device |
-
----
-
-## 🔮 Future Improvements
-
-- [ ] Threat filtering and advanced search
-- [ ] PDF / CSV export for reports
-- [ ] Historical log search
-- [ ] User authentication
-- [ ] Role-based access control (RBAC)
-- [ ] Enhanced threat analytics
-
----
-
-## 📄 License
-
-This project is intended for **educational and research purposes** only.
+This project is provided for educational and research purposes.

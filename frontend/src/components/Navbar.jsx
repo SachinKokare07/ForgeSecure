@@ -14,16 +14,12 @@ function Navbar({ lastUpdated, totalLogs, connectionLabel = 'Polling backend eve
 
             <div className="flex flex-wrap items-center gap-2">
               <Pill tone="green">{connectionLabel}</Pill>
-              <Pill tone={health.backend === 'online' ? 'green' : health.backend === 'degraded' ? 'red' : 'amber'}>Backend {labelForHealth(health.backend)}</Pill>
-              <Pill tone={health.ai === 'active' ? 'green' : 'amber'}>AI {labelForHealth(health.ai)}</Pill>
-              <Pill tone={health.simulator === 'live' ? 'green' : health.simulator === 'idle' ? 'amber' : 'slate'}>Simulator {labelForHealth(health.simulator)}</Pill>
-              <Pill tone={health.socket === 'connected' ? 'green' : health.socket === 'fallback' ? 'amber' : 'slate'}>Socket {labelForHealth(health.socket)}</Pill>
-              <button
-                type="button"
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-200 transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
-                onClick={onToggleSound}
-              >
-                Alert sound {soundEnabled ? 'armed' : 'placeholder'}
+              <Pill tone={health.backend === 'online' ? 'green' : health.backend === 'degraded' ? 'red' : 'amber'}>Backend {health.backend}</Pill>
+              <Pill tone={health.ai === 'active' ? 'green' : 'amber'}>AI {health.ai}</Pill>
+              <Pill tone={health.simulator === 'live' ? 'green' : health.simulator === 'idle' ? 'amber' : 'slate'}>Simulator {health.simulator}</Pill>
+              <Pill tone={health.socket === 'connected' ? 'green' : health.socket === 'fallback' ? 'amber' : 'slate'}>Socket {health.socket}</Pill>
+              <button type="button" className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-200 transition hover:border-cyan-400/30 hover:bg-cyan-400/10" onClick={onToggleSound}>
+                Alert sound {soundEnabled ? 'armed' : 'muted'}
               </button>
             </div>
           </div>
@@ -36,39 +32,23 @@ function Navbar({ lastUpdated, totalLogs, connectionLabel = 'Polling backend eve
         </div>
       </div>
     </header>
-  )
-}
-
-function labelForHealth(value) {
-  const labels = {
-    online: 'online',
-    degraded: 'degraded',
-    checking: 'checking',
-    active: 'active',
-    standby: 'standby',
-    live: 'live',
-    idle: 'idle',
-    waiting: 'waiting',
-    connected: 'connected',
-    fallback: 'fallback',
-    connecting: 'connecting',
-  }
-
-  return labels[value] || 'status'
+  );
 }
 
 function Pill({ tone, children }) {
   const toneClasses = {
     green: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-200',
+    red: 'border-red-500/20 bg-red-500/10 text-red-200',
+    amber: 'border-amber-500/20 bg-amber-500/10 text-amber-200',
     cyan: 'border-cyan-400/20 bg-cyan-400/10 text-cyan-200',
     slate: 'border-white/10 bg-white/5 text-slate-300',
-  }
+  };
 
   return (
     <div className={`rounded-full border px-4 py-2 text-xs font-medium ${toneClasses[tone] || toneClasses.slate}`}>
       {children}
     </div>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;
