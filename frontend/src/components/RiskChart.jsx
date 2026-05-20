@@ -102,15 +102,10 @@ function Metric({ label, value, tone }) {
     red: 'border-red-500/20 bg-red-500/10 text-red-100',
     amber: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
   }
-
   return (
-    <div
-      className={`min-w-21 sm:min-w-26 lg:min-w-28 xl:min-w-32 max-w-32 rounded-lg border px-2.5 py-2 flex flex-col items-center justify-center ${
-        toneClasses[tone] || toneClasses.amber
-      }`}
-    >
-      <p className="text-[9px] font-semibold uppercase tracking-[0.04em] text-slate-500 leading-snug whitespace-normal wrap-break-word sm:text-[10px]">{label}</p>
-      <p className="mt-1 text-sm sm:text-base font-semibold leading-tight text-white">{value}</p>
+    <div className="w-full sm:w-auto max-w-full min-w-0 px-1 text-center">
+      <p className="text-[9px] text-slate-400 uppercase font-semibold leading-tight truncate">{label}</p>
+      <p className={`mt-1 text-sm sm:text-base font-semibold leading-tight ${tone === 'red' ? 'text-red-300' : tone === 'amber' ? 'text-amber-300' : 'text-white'}`}>{value}</p>
     </div>
   )
 }

@@ -113,8 +113,8 @@ function TrafficChart({ logs }) {
 
 function Metric({ label, value }) {
   return (
-    <div className="min-w-21 sm:min-w-26 lg:min-w-28 xl:min-w-32 max-w-32 rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 flex flex-col items-center justify-center">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.04em] text-slate-500 leading-snug whitespace-normal wrap-break-word sm:text-[10px]">{label}</p>
+    <div className="w-full sm:w-auto max-w-full min-w-0 px-1 text-center">
+      <p className="text-[9px] text-slate-400 uppercase font-semibold leading-tight truncate">{label}</p>
       <p className="mt-1 text-sm sm:text-base font-semibold leading-tight text-white">{value}</p>
     </div>
   )

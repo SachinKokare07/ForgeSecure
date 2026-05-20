@@ -11,6 +11,8 @@ import TrafficChart from "../components/TrafficChart";
 import RiskChart from "../components/RiskChart";
 import HeatmapChart from "../components/HeatmapChart";
 import DeviceTable from "../components/DeviceTable";
+import FilterBar from "../components/FilterBar";
+import ExportSection from "../components/ExportSection";
 
 const FALLBACK_POLL_INTERVAL_MS = 3000;
 const NEW_ITEM_FLASH_MS = 1800;
@@ -28,6 +30,7 @@ function Dashboard() {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(0);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
   const fallbackPollRef = useRef(null);
   const flashTimersRef = useRef(new Map());
@@ -262,15 +265,29 @@ function Dashboard() {
     return sortedLogs.slice(0, MAX_CHART_POINTS).reverse();
   }, [sortedLogs]);
 
+  const filteredLogs = useMemo(() => {
+    if (selectedFilter === "all") return sortedLogs;
+
+    return sortedLogs.filter((log) => {
+      if (selectedFilter === "normal") return log.status === "NORMAL";
+      if (selectedFilter === "anomaly") return log.status === "ANOMALY";
+      if (selectedFilter === "critical") return log.severity === "CRITICAL";
+      if (selectedFilter === "active") return log.incidentStatus === "ACTIVE";
+      if (selectedFilter === "acknowledged") return log.incidentStatus === "ACKNOWLEDGED";
+      if (selectedFilter === "resolved") return log.incidentStatus === "RESOLVED";
+      return true;
+    });
+  }, [sortedLogs, selectedFilter]);
+
   const anomalyLogs = useMemo(() => {
-    return sortedLogs.filter(
+    return filteredLogs.filter(
       (log) => log.status === "ANOMALY" || log.severity === "CRITICAL",
     );
-  }, [sortedLogs]);
+  }, [filteredLogs]);
 
   const liveFeed = useMemo(() => {
-    return sortedLogs.slice(0, MAX_FEED_ITEMS);
-  }, [sortedLogs]);
+    return filteredLogs.slice(0, MAX_FEED_ITEMS);
+  }, [filteredLogs]);
 
   const totalLogs = sortedLogs.length;
 
@@ -312,7 +329,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen text-slate-100">
+    <div className="min-h-screen text-slate-100 no-overflow-x">
       {topBanner ? (
         <div className="critical-banner border-b border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-50 shadow-[0_0_40px_rgba(239,68,68,0.18)] backdrop-blur">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
@@ -342,7 +359,19 @@ function Dashboard() {
         onToggleSound={() => setSoundEnabled((value) => !value)}
       />
 
-      <main className="mx-auto w-full max-w-full px-4 py-5 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-full px-4 py-5 sm:px-6 lg:px-8 overflow-x-hidden">
+        <FilterBar selectedFilter={selectedFilter} onFilterChange={setSelectedFilter} />
+        
+        <ExportSection 
+          logs={filteredLogs} 
+          stats={{
+            totalLogs: filteredLogs.length,
+            totalAnomalies: filteredLogs.filter((log) => log.status === "ANOMALY").length,
+            criticalThreats: filteredLogs.filter((log) => log.severity === "CRITICAL").length,
+            activeDevices: new Set(filteredLogs.map((log) => log.device).filter(Boolean)).size,
+          }}
+        />
+
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <StatsCard
             title="Total Logs"
@@ -429,19 +458,17 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="-mt-4 grid gap-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr]">
-          <DeviceTable logs={sortedLogs} />
+        <section className="-mt-4 grid gap-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr] items-stretch">
+          <DeviceTable logs={filteredLogs} />
+          <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60 shadow-[0_20px_80px_rgba(2,6,23,0.35)]" style={{ maxHeight: 550 }}>
+            <div className="border-b border-white/10 bg-linear-to-r from-slate-950/40 to-slate-950/20 px-4 py-3 backdrop-blur sm:px-5 sm:py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-semibold text-white">Recent Anomalies</h3>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4 flex flex-col overflow-hidden h-full min-h-0">
-            <div className="flex items-center justify-between shrink-0">
-              <div>
-                <h3 className="text-base font-semibold text-white">
-                  Recent Anomalies
-                </h3>
-
-                <p className="mt-0.5 text-xs text-slate-400">
-                  Escalated events requiring attention.
-                </p>
+                  <p className="mt-0.5 text-xs text-slate-400">Escalated events requiring attention.</p>
+                </div>
+                <span className="shrink-0 rounded-full border border-red-400/30 bg-red-400/10 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.26em] text-red-200 shadow-[0_0_12px_rgba(239,68,68,0.06)]">{anomalyLogs.length}</span>
               </div>
             </div>
 

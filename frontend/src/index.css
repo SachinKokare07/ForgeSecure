@@ -6,6 +6,34 @@ body,
   min-height: 100%;
 }
 
+/* Ensure predictable sizing and prevent overflow from fixed widths */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.no-overflow-x { overflow-x: hidden; }
+
+/* Responsive metrics grid breakpoints matching requirements */
+.metrics-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+@media (max-width: 1200px) {
+  .metrics-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 992px) {
+  .metrics-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 576px) {
+  .metrics-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}
+
 html {
   background: #020617;
 }

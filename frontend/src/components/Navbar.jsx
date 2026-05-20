@@ -5,9 +5,7 @@ function Navbar({ lastUpdated, totalLogs, connectionLabel = 'Polling backend eve
         <div>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-3">
-              <div className="scan-orbit flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 shadow-[0_0_40px_rgba(34,211,238,0.2)]">
-                <span className="text-lg font-bold text-cyan-300">F</span>
-              </div>
+              <img src="/image.png" alt="ForgeSecure Logo" className="h-11 w-11 object-contain" />
               <div>
                 <p className="text-lg font-semibold uppercase tracking-[0.18em] text-white">ForgeSecure</p>
                 <p className="text-sm text-slate-400">AI-Powered Network Anomaly Detection Platform</p>

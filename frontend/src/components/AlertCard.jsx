@@ -47,9 +47,9 @@ function AlertCard({
       }`}
     >
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 w-full box-border">
 
-        <div>
+        <div className="flex-1 min-w-0">
 
           <div className="flex items-center gap-2">
 
@@ -63,7 +63,7 @@ function AlertCard({
               } shadow-[0_0_12px_rgba(34,211,238,0.35)]`}
             />
 
-            <h4 className="max-w-56 truncate text-sm font-semibold text-white sm:max-w-none">
+            <h4 className="truncate text-sm font-semibold text-white" title={device}>
               {device}
             </h4>
 
@@ -89,7 +89,7 @@ function AlertCard({
 
         </div>
 
-        <div className="text-right">
+        <div className="text-right flex-shrink-0">
 
           <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">
             {timestamp}
@@ -109,54 +109,23 @@ function AlertCard({
 
       </div>
 
-      <div
-        className={`mt-3 grid gap-2 text-sm sm:mt-4 sm:gap-3 ${
-              compact
-            ? "grid-cols-2 sm:grid-cols-3"
-            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6"
-        }`}
-      >
+      <div className="mt-3 flex flex-wrap gap-3 text-sm sm:mt-4" style={{ width: '100%', boxSizing: 'border-box' }}>
 
-        <Metric
-          label="Duration"
-          value={formatDuration(duration)}
-          unit=" s"
-        />
+        <Metric label="Duration" value={formatDuration(duration)} unit=" s" />
 
-        <Metric
-          label="Src Bytes"
-          value={formatBytes(src_bytes)}
-          unit=""
-        />
+        <Metric label="Src Bytes" value={formatBytes(src_bytes)} unit="" />
 
-        <Metric
-          label="Dst Bytes"
-          value={formatBytes(dst_bytes)}
-          unit=""
-        />
+        <Metric label="Dst Bytes" value={formatBytes(dst_bytes)} unit="" />
 
-        <Metric
-          label="Src Packets"
-          value={formatCount(src_pkts)}
-          unit=""
-        />
+        <Metric label="Src Packets" value={formatCount(src_pkts)} unit="" />
 
-        <Metric
-          label="Dst Packets"
-          value={formatCount(dst_pkts)}
-          unit=""
-        />
+        <Metric label="Dst Packets" value={formatCount(dst_pkts)} unit="" />
 
-        <Metric
-          label="Confidence"
-          value={confidence}
-          unit="%"
-          highlight
-        />
+        <Metric label="Confidence" value={confidence} unit="%" highlight />
 
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
 
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -172,13 +141,13 @@ function AlertCard({
 
         {status === "ANOMALY" && (
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
 
             {incidentStatus === "ACTIVE" && (
 
               <button
                 onClick={() => onAcknowledge(id)}
-                className="px-3 py-1 text-xs rounded-lg bg-yellow-500 text-black font-semibold hover:bg-yellow-400 transition-all"
+                className="px-3 py-1 text-xs rounded-lg bg-yellow-500 text-black font-semibold hover:bg-yellow-400 transition-all flex-shrink-0"
               >
                 Acknowledge
               </button>
@@ -189,7 +158,7 @@ function AlertCard({
 
               <button
                 onClick={() => onResolve(id)}
-                className="px-3 py-1 text-xs rounded-lg bg-green-500 text-white font-semibold hover:bg-green-400 transition-all"
+                className="px-3 py-1 text-xs rounded-lg bg-green-500 text-white font-semibold hover:bg-green-400 transition-all flex-shrink-0"
               >
                 Resolve
               </button>
@@ -215,33 +184,13 @@ function Metric({
 }) {
 
   return (
-
-    <div
-      className={`min-w-21 sm:min-w-26 max-w-32 rounded-lg border px-2.5 py-2 text-center sm:px-3 flex flex-col items-center justify-center ${
-        highlight
-          ? "border-cyan-400/20 bg-cyan-400/10"
-          : "border-white/5 bg-white/5"
-      }`}
-    >
-
-      <p className="text-[9px] font-semibold uppercase tracking-[0.04em] text-slate-500 leading-snug whitespace-normal wrap-break-word sm:text-[10px]">
-        {label}
-      </p>
-
-      <p
-        className={`mt-1 text-sm sm:text-base font-semibold leading-tight ${
-          highlight
-            ? "text-cyan-300"
-            : "text-white"
-        }`}
-      >
-        {value}
-        {unit}
-      </p>
-
+    <div className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/6 box-border px-1`}>
+      <div className="w-full text-center px-1">
+        <p className="text-[9px] text-slate-400 uppercase font-semibold leading-tight truncate">{label}</p>
+        <p className={`mt-1 text-sm sm:text-base font-semibold leading-tight ${highlight ? 'text-cyan-300' : 'text-white'}`}>{value}{unit}</p>
+      </div>
     </div>
-
-  );
+  )
 }
 
 function formatDuration(value) {
